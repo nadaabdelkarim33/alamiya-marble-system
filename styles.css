@@ -255,40 +255,52 @@ header h1 { margin: 6px 0 0; font-size: 30px; }
 }
 
 @media (max-width: 720px) {
-  body { padding-bottom: 82px; }
-  main { padding: 18px 20px 24px; }
+  body { padding-bottom: 0; }
+  main { padding: 18px 14px 24px; }
   aside {
-    position: static;
-    padding: 14px 18px;
-    justify-content: center;
+    position: sticky;
+    top: 0;
+    padding: 12px 14px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
   }
   aside nav {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 30;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;
-    padding: 8px 10px;
-    background: rgba(255,255,255,.97);
-    border-top: 1px solid var(--line);
-    box-shadow: 0 -8px 24px rgba(11,28,48,.08);
+    position: static;
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 4px 0 8px;
+    overflow-x: auto;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    scrollbar-width: thin;
   }
   .nav {
-    min-height: 58px;
-    flex-direction: column;
-    gap: 3px;
-    font-size: 11px;
-    padding: 6px 4px;
+    min-height: 42px;
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: 6px;
+    font-size: 12px;
+    padding: 8px 12px;
+    white-space: nowrap;
   }
-  .nav:nth-of-type(n+5) { display: none; }
   header, .hero, .toolbar { align-items: stretch; flex-direction: column; }
-  .actions > *, .toolbar > *, .primary, .ghost { width: 100%; }
-  nav, .stats, .cards, .grid.two, .board, .form-grid { grid-template-columns: 1fr; }
+  .actions, .toolbar, .form-actions { align-items: stretch; }
+  .actions > *, .toolbar > *, .form-actions > * { width: 100%; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cards, .grid.two { grid-template-columns: 1fr; }
+  .board { grid-template-columns: repeat(4, minmax(220px, 1fr)); overflow-x: auto; }
+  .form-grid { grid-template-columns: 1fr; }
   .hero { min-height: 260px; }
-  table { min-width: 680px; }
+  .table-wrap { overflow-x: auto; }
+  table { min-width: 760px; }
+  .brand strong { font-size: 18px; }
+  .brand span { font-size: 11px; }
 }
 
 /* Stitch 6 visual system: moving marble, glass cards, and deliberate motion. */
@@ -592,7 +604,7 @@ dialog[open] {
 
 @media (max-width: 720px) {
   aside nav {
-    background: rgba(255,255,255,.82);
+    background: transparent;
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
   }
@@ -600,5 +612,229 @@ dialog[open] {
   .login-card {
     min-height: auto;
     padding: 28px 22px;
+  }
+}
+
+/* Mobile readability fixes */
+button,
+.nav,
+.primary,
+.ghost,
+.chip,
+.tag,
+th,
+td {
+  line-height: 1.55;
+}
+
+.nav,
+.primary,
+.ghost {
+  white-space: normal;
+  min-height: 44px;
+  height: auto;
+}
+
+.panel,
+.card,
+.stat,
+.item,
+.order-card,
+.chip,
+.tag,
+button {
+  min-width: 0;
+}
+
+h1,
+h2,
+h3,
+p,
+span,
+strong,
+button,
+label,
+td,
+th {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 720px) {
+  aside {
+    position: static;
+  }
+
+  aside nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .nav {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .nav .material-symbols-outlined {
+    flex: 0 0 auto;
+  }
+
+  header h1 {
+    font-size: 24px;
+    line-height: 1.35;
+  }
+
+  .hero h2 {
+    font-size: 24px;
+    line-height: 1.45;
+  }
+
+  .panel-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .panel-head .primary,
+  .panel-head .ghost {
+    width: 100%;
+  }
+
+  .stat strong {
+    font-size: 20px;
+    line-height: 1.35;
+  }
+
+  .card-body,
+  .panel,
+  .item,
+  .order-card {
+    overflow: visible;
+  }
+
+  .row-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .row-actions .ghost {
+    width: 100%;
+  }
+
+  .login-card {
+    width: min(430px, calc(100vw - 24px));
+  }
+}
+
+/* Phone desktop-mode: keep the full laptop layout and allow horizontal panning. */
+@media (max-width: 720px) {
+  html,
+  body {
+    overflow-x: auto;
+  }
+
+  body:has(.app:not(.hidden)) {
+    min-width: 1180px;
+  }
+
+  .app:not(.hidden) {
+    width: 1180px;
+    min-width: 1180px;
+  }
+
+  .app:not(.hidden) aside {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    height: auto;
+    padding: 14px 64px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .app:not(.hidden) aside nav {
+    position: static;
+    width: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 0;
+    overflow: visible;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .app:not(.hidden) .nav {
+    width: auto;
+    min-height: 38px;
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: 8px;
+    padding: 8px 10px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .app:not(.hidden) main {
+    width: 100%;
+    max-width: 1440px;
+    padding: 28px 64px 36px;
+    margin: 0 auto;
+  }
+
+  .app:not(.hidden) header,
+  .app:not(.hidden) .hero,
+  .app:not(.hidden) .toolbar {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .app:not(.hidden) .actions > *,
+  .app:not(.hidden) .toolbar > *,
+  .app:not(.hidden) .form-actions > * {
+    width: auto;
+  }
+
+  .app:not(.hidden) .stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .app:not(.hidden) .cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .app:not(.hidden) .grid.two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app:not(.hidden) .board {
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    overflow: visible;
+  }
+
+  .app:not(.hidden) .form-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .app:not(.hidden) .panel-head {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .app:not(.hidden) .panel-head .primary,
+  .app:not(.hidden) .panel-head .ghost {
+    width: auto;
+  }
+
+  .app:not(.hidden) table {
+    min-width: 760px;
   }
 }
