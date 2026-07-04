@@ -838,3 +838,32 @@ th {
     min-width: 760px;
   }
 }
+
+/* Phone full-desktop fit: show the laptop layout scaled into one mobile screen. */
+@media (max-width: 720px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  body:has(.app:not(.hidden)) {
+    min-width: 0;
+  }
+
+  .app:not(.hidden) {
+    width: 1180px;
+    min-width: 1180px;
+    transform: scale(var(--phone-scale, .36));
+    transform-origin: top right;
+    margin-left: auto;
+    margin-bottom: calc(-100vh * (1 - var(--phone-scale, .36)));
+  }
+
+  .app:not(.hidden) aside {
+    position: relative;
+  }
+
+  .app:not(.hidden) main {
+    padding-top: 22px;
+  }
+}
