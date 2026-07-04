@@ -1,0 +1,217 @@
+{
+  "products": [
+    {
+      "id": "p-1",
+      "name": "رخام كرارة",
+      "kind": "رخام",
+      "color": "أبيض بعروق رمادي",
+      "size": "60x120",
+      "thickness": "2 سم",
+      "price": 2450,
+      "quantity": 59,
+      "minStock": 25,
+      "image": "",
+      "notes": "خام فاخر للواجهات والمطابخ"
+    },
+    {
+      "id": "p-2",
+      "name": "جرانيت أسود أسوان",
+      "kind": "جرانيت",
+      "color": "أسود منقط",
+      "size": "ألواح",
+      "thickness": "3 سم",
+      "price": 1350,
+      "quantity": 0,
+      "minStock": 20,
+      "image": "",
+      "notes": "مناسب للسلالم والأرضيات"
+    },
+    {
+      "id": "p-1783121198886-16337674771b6",
+      "kind": "رخام",
+      "name": "جرانيت",
+      "color": "اسود",
+      "size": "120",
+      "thickness": "150",
+      "price": 1000,
+      "imageFile": {},
+      "notes": "",
+      "quantity": 0,
+      "minStock": 0,
+      "image": ""
+    },
+    {
+      "id": "p-1783122271216-3a4fa381e1d1b8",
+      "kind": "جرانيت",
+      "name": "اسود",
+      "color": "اسود",
+      "size": "120",
+      "thickness": "50",
+      "price": 1000,
+      "imageFile": {},
+      "notes": "",
+      "quantity": 0,
+      "minStock": 0,
+      "image": ""
+    }
+  ],
+  "customers": [
+    {
+      "id": "c-1",
+      "name": "شركة النور للمقاولات",
+      "phone": "01000000000",
+      "address": "القاهرة",
+      "notes": "عميل مستمر"
+    },
+    {
+      "id": "c-1783119353529-effaafa5858d4",
+      "name": "محمد",
+      "phone": "+201017620872",
+      "address": "كفر السكرية",
+      "notes": ""
+    }
+  ],
+  "documents": [
+    {
+      "type": "invoice",
+      "customerId": "c-1",
+      "productId": "p-1",
+      "unitMode": "meter",
+      "quantity": 1,
+      "unitPrice": 2450,
+      "discount": 0,
+      "notes": "",
+      "id": "d-1783119375111-91621092e0cd78",
+      "number": "INV-0001",
+      "date": "2026-07-03",
+      "total": 2450,
+      "createdBy": "u-admin"
+    },
+    {
+      "type": "invoice",
+      "customerId": "c-1",
+      "productId": "p-1783121198886-16337674771b6",
+      "unitMode": "meter",
+      "quantity": 20,
+      "unitPrice": 1000,
+      "discount": 0,
+      "notes": "مطبخ ",
+      "id": "d-1783121418296-1f8213f344c288",
+      "number": "INV-0002",
+      "date": "2026-07-03",
+      "total": 20000,
+      "createdBy": "u-admin"
+    },
+    {
+      "type": "quote",
+      "customerId": "c-1",
+      "productId": "p-1",
+      "unitMode": "linear",
+      "quantity": 120,
+      "unitPrice": 2450,
+      "linearWidth": "60",
+      "widthFactor": 20,
+      "discount": 0,
+      "notes": "",
+      "id": "d-1783121728062-d0ef439ab8827",
+      "number": "Q-0003",
+      "date": "2026-07-03",
+      "total": 5880000,
+      "createdBy": "u-admin"
+    },
+    {
+      "type": "invoice",
+      "customerId": "c-1",
+      "productId": "p-2",
+      "unitMode": "linear",
+      "quantity": 150,
+      "unitPrice": 1350,
+      "linearWidth": "60",
+      "widthFactor": 50,
+      "discount": 0,
+      "paymentStatus": "deposit",
+      "paidAmount": 2450,
+      "paymentMethod": "vodafone",
+      "notes": "",
+      "id": "d-1783122175583-560ddda0710f5",
+      "number": "INV-0004",
+      "date": "2026-07-03",
+      "createdAt": "2026-07-03T23:42:55.583Z",
+      "total": 10125000,
+      "createdBy": "u-admin"
+    },
+    {
+      "type": "invoice",
+      "customerId": "c-1",
+      "productId": "p-1",
+      "unitMode": "linear",
+      "quantity": 120,
+      "unitPrice": 2450,
+      "linearWidth": "60",
+      "widthFactor": 20,
+      "discount": 0,
+      "paymentStatus": "deposit",
+      "paidAmount": 5000,
+      "paymentMethod": "cash",
+      "notes": "",
+      "id": "d-1783122379261-991c3b698b0f6",
+      "number": "INV-0005",
+      "date": "2026-07-03",
+      "createdAt": "2026-07-03T23:46:19.261Z",
+      "total": 5880000,
+      "createdBy": "u-admin"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "s-1",
+      "name": "محاجر المنيا",
+      "phone": "01111111111",
+      "address": "المنيا"
+    }
+  ],
+  "movements": [],
+  "orders": [
+    {
+      "customerId": "c-1783119353529-effaafa5858d4",
+      "productId": "p-1",
+      "status": "قيد المعاينة",
+      "deliveryDate": "2026-07-05",
+      "technician": "",
+      "notes": "سلالم",
+      "id": "o-1783121808362-cda39e60719e3",
+      "createdAt": "2026-07-03",
+      "createdBy": "u-admin"
+    }
+  ],
+  "users": [
+    {
+      "id": "u-admin",
+      "username": "ايهاب عبدالعال",
+      "name": "م/ إيهاب عبدالعال",
+      "password": "123456",
+      "role": "admin"
+    },
+    {
+      "id": "u-sales",
+      "username": "sales",
+      "name": "موظف مبيعات",
+      "password": "123456",
+      "role": "sales"
+    },
+    {
+      "id": "u-stock",
+      "username": "stock",
+      "name": "مسؤول المخزن",
+      "password": "123456",
+      "role": "stock"
+    },
+    {
+      "id": "u-accountant",
+      "username": "accountant",
+      "name": "المحاسب",
+      "password": "123456",
+      "role": "accountant"
+    }
+  ]
+}
