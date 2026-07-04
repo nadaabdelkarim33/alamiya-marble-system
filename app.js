@@ -8,6 +8,16 @@ const id = prefix => `${prefix}-${Date.now()}-${Math.random().toString(16).slice
 let state = null;
 let currentUser = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null");
 
+function syncPhoneScale() {
+  const desktopWidth = 1180;
+  const scale = Math.min(window.innerWidth / desktopWidth, 1);
+  document.documentElement.style.setProperty("--phone-scale", scale.toFixed(4));
+}
+
+syncPhoneScale();
+window.addEventListener("resize", syncPhoneScale);
+window.addEventListener("orientationchange", syncPhoneScale);
+
 const els = {
   loginScreen: document.querySelector("#loginScreen"),
   appShell: document.querySelector("#appShell"),
