@@ -255,40 +255,52 @@ header h1 { margin: 6px 0 0; font-size: 30px; }
 }
 
 @media (max-width: 720px) {
-  body { padding-bottom: 82px; }
-  main { padding: 18px 20px 24px; }
+  body { padding-bottom: 0; }
+  main { padding: 18px 14px 24px; }
   aside {
-    position: static;
-    padding: 14px 18px;
-    justify-content: center;
+    position: sticky;
+    top: 0;
+    padding: 12px 14px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
   }
   aside nav {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 30;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;
-    padding: 8px 10px;
-    background: rgba(255,255,255,.97);
-    border-top: 1px solid var(--line);
-    box-shadow: 0 -8px 24px rgba(11,28,48,.08);
+    position: static;
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 4px 0 8px;
+    overflow-x: auto;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    scrollbar-width: thin;
   }
   .nav {
-    min-height: 58px;
-    flex-direction: column;
-    gap: 3px;
-    font-size: 11px;
-    padding: 6px 4px;
+    min-height: 42px;
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: 6px;
+    font-size: 12px;
+    padding: 8px 12px;
+    white-space: nowrap;
   }
-  .nav:nth-of-type(n+5) { display: none; }
   header, .hero, .toolbar { align-items: stretch; flex-direction: column; }
-  .actions > *, .toolbar > *, .primary, .ghost { width: 100%; }
-  nav, .stats, .cards, .grid.two, .board, .form-grid { grid-template-columns: 1fr; }
+  .actions, .toolbar, .form-actions { align-items: stretch; }
+  .actions > *, .toolbar > *, .form-actions > * { width: 100%; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cards, .grid.two { grid-template-columns: 1fr; }
+  .board { grid-template-columns: repeat(4, minmax(220px, 1fr)); overflow-x: auto; }
+  .form-grid { grid-template-columns: 1fr; }
   .hero { min-height: 260px; }
-  table { min-width: 680px; }
+  .table-wrap { overflow-x: auto; }
+  table { min-width: 760px; }
+  .brand strong { font-size: 18px; }
+  .brand span { font-size: 11px; }
 }
 
 /* Stitch 6 visual system: moving marble, glass cards, and deliberate motion. */
@@ -592,7 +604,7 @@ dialog[open] {
 
 @media (max-width: 720px) {
   aside nav {
-    background: rgba(255,255,255,.82);
+    background: transparent;
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
   }
