@@ -109,8 +109,14 @@
                   <h2>بنود الفاتورة</h2>
                   <button class="ghost" type="button" id="addInvoiceItem"><span class="material-symbols-outlined">add</span>إضافة بند</button>
                 </div>
+                <div class="calc-guide">
+                  <span><strong>متر مربع</strong> الطول × العرض × العدد × السعر</span>
+                  <span><strong>متر طولي</strong> الطول × القائم × العدد × السعر</span>
+                  <span><strong>توريد وتركيب</strong> المساحة × العدد × سعر التوريد + التركيب</span>
+                </div>
                 <div class="invoice-items-head">
                   <span>نوع الحساب</span>
+                  <span>بيان</span>
                   <span>العدد</span>
                   <span>المقاس</span>
                   <span>قائم / تركيب</span>
@@ -121,10 +127,11 @@
                 <div id="invoiceItems"></div>
               </div>
               <label>الخصم<input name="discount" type="number" step="0.01" min="0" value="0" /></label>
-              <label>مصنعية / تركيب إضافي<input name="extraWorkCost" type="number" step="0.01" min="0" value="0" placeholder="أي زيادة على المبلغ" /></label>
+              <label class="extra-work-box">مصنعية / تركيب / شغل إضافي<input name="extraWorkCost" type="number" step="0.01" min="0" value="0" placeholder="أي زيادة على المبلغ" /></label>
               <label>حالة الدفع<select name="paymentStatus"><option value="paid">دفع كامل</option><option value="deposit">عربون</option><option value="unpaid">مدفعش</option></select></label>
               <label>المدفوع<input name="paidAmount" type="number" step="0.01" min="0" value="0" /></label>
               <label>طريقة الدفع<select name="paymentMethod"><option value="cash">نقدي</option><option value="vodafone">فودافون كاش</option><option value="instapay">انستا باي</option><option value="bank">تحويل بنكي</option></select></label>
+              <label class="paper-size-box">مقاس ورقة الفاتورة<select name="invoicePaperSize"><option value="paper-a4">A4</option><option value="paper-a5">A5</option><option value="paper-half">نصف A4</option><option value="paper-receipt">ورق فاتورة صغير</option></select></label>
               <label>حالة الطلب<select name="orderStatus"><option>قيد المعاينة</option><option>جاري التصنيع</option><option>جاهز</option><option>تم التركيب</option></select></label>
               <label>ميعاد التسليم<input name="deliveryDate" type="date" /></label>
               <label>الفني / فريق التركيب<input name="technician" /></label>

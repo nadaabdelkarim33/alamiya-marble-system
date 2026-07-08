@@ -1,6 +1,7 @@
 const API = "/api/state";
 const SESSION_KEY = "alAlamiya.currentUser";
 const STATIC_STORAGE_KEY = "alAlamiya.githubPagesState";
+const ACTIVE_VIEW_KEY = "alAlamiya.activeView";
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "EGP", maximumFractionDigits: 0 });
 const today = () => new Date().toISOString().slice(0, 10);
 const id = prefix => `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -129,6 +130,8 @@ function showApp() {
   if (!currentUser) return;
   els.currentUser.textContent = `${currentUser.name} - ${roleText[currentUser.role]}`;
   applyPermissions();
+  const savedView = sessionStorage.getItem(ACTIVE_VIEW_KEY);
+  if (savedView && roleViews[currentUser.role]?.includes(savedView)) switchView(savedView);
   renderAll();
 }
 
@@ -148,6 +151,7 @@ function switchView(view) {
   document.querySelector(`#${view}View`).classList.add("active");
   document.querySelectorAll(".nav").forEach(btn => btn.classList.toggle("active", btn.dataset.view === view));
   els.pageTitle.textContent = titles[view];
+  sessionStorage.setItem(ACTIVE_VIEW_KEY, view);
 }
 
 function productById(productId) {
@@ -269,6 +273,7 @@ function getDocumentItems(form = document.querySelector("#documentForm")) {
   return rows.map(row => {
     const item = {
       mode: row.querySelector('[data-item-field="mode"]').value || "meter",
+      description: row.querySelector('[data-item-field="description"]').value.trim(),
       count: Number(row.querySelector('[data-item-field="count"]').value || 0),
       measure: row.querySelector('[data-item-field="measure"]').value.trim(),
       qaim: Number(row.querySelector('[data-item-field="qaim"]').value || 1),
@@ -304,7 +309,8 @@ function documentCalculationSummary(doc) {
       : item.mode === "supply_install"
         ? ` | تركيب ${money.format(Number(item.qaim || 0))}`
         : "";
-    return `بند ${index + 1}: ${mode} | عدد ${item.count || 0} | مقاس ${item.measure || "-"} | سعر ${money.format(Number(item.price || 0))}${extra} | ${total}`;
+    const description = item.description ? ` | بيان ${item.description}` : "";
+    return `بند ${index + 1}: ${mode}${description} | عدد ${item.count || 0} | مقاس ${item.measure || "-"} | سعر ${money.format(Number(item.price || 0))}${extra} | ${total}`;
   }).join("<br>");
 }
 
@@ -453,7 +459,7 @@ function renderDocuments() {
       <td>${customerById(d.customerId)?.name || ""}</td><td>${documentProductName(d)}</td>
       <td>${d.orderStatus || "-"}</td><td>${d.deliveryDate || "-"}</td>
       <td>${money.format(Number(d.total || 0))}</td><td>${d.date}</td>
-      <td><div class="row-actions"><button class="ghost" data-open-doc="${d.id}">فتح الفاتورة</button><button class="ghost" data-print-doc="${d.id}">طباعة</button><button class="ghost" data-pdf-doc="${d.id}">حفظ PDF</button><button class="ghost" data-whatsapp-doc="${d.id}">واتساب</button><button class="ghost" data-delete-doc="${d.id}">حذف</button></div></td>
+      <td><div class="row-actions"><button class="ghost" type="button" data-open-doc="${d.id}">فتح الفاتورة</button><button class="ghost" type="button" data-print-doc="${d.id}">طباعة</button><button class="ghost" type="button" data-pdf-doc="${d.id}">حفظ PDF</button><button class="ghost" type="button" data-whatsapp-doc="${d.id}">واتساب</button><button class="ghost" type="button" data-delete-doc="${d.id}">حذف</button></div></td>
     </tr>
   `).join("");
 }
@@ -464,6 +470,10 @@ function paymentStatusText(status) {
 
 function paymentMethodText(method) {
   return { cash: "نقدي", vodafone: "فودافون كاش", instapay: "انستا باي", bank: "تحويل بنكي" }[method] || "-";
+}
+
+function paperSizeText(size) {
+  return { "paper-a4": "A4", "paper-a5": "A5", "paper-half": "نصف A4", "paper-receipt": "ورق فاتورة صغير" }[size] || "A4";
 }
 
 function formatDateTime(value) {
@@ -638,6 +648,7 @@ function addInvoiceItemRow(item = {}) {
       <option value="linear" ${selectedMode === "linear" ? "selected" : ""}>متر طولي</option>
       <option value="supply_install" ${selectedMode === "supply_install" ? "selected" : ""}>توريد وتركيب</option>
     </select>
+    <input data-item-field="description" placeholder="بيان البند: دي لأي؟" value="${escapeHtml(item.description || "")}" />
     <input data-item-field="count" type="number" step="0.01" min="0" placeholder="عدد" value="${escapeHtml(item.count ?? 1)}" />
     <input data-item-field="measure" placeholder="مثال: 1.20×0.60 أو 1.20" value="${escapeHtml(item.measure || "")}" />
     <input data-item-field="qaim" type="number" step="0.01" min="0" placeholder="قائم / تركيب" value="${escapeHtml(item.qaim ?? "")}" />
@@ -696,6 +707,7 @@ function updateDocPrice() {
     syncInvoiceItemRow(row);
     const item = {
       mode: row.querySelector('[data-item-field="mode"]').value,
+      description: row.querySelector('[data-item-field="description"]').value,
       count: row.querySelector('[data-item-field="count"]').value,
       measure: row.querySelector('[data-item-field="measure"]').value,
       qaim: row.querySelector('[data-item-field="qaim"]').value,
@@ -819,6 +831,7 @@ function printDocument(docId, action = "open") {
   const showroomAddressText = "المعرض: شبين الكوم - شارع حامد نصار أمام مجمع المرافق";
   const factoryMapUrl = "https://maps.app.goo.gl/3eGsCPyYDPsLubm98";
   const showroomMapUrl = "https://maps.app.goo.gl/mXH7ahSLZ6P696XQ7";
+  const savedPaperSize = ["paper-a4", "paper-a5", "paper-half", "paper-receipt"].includes(d.invoicePaperSize) ? d.invoicePaperSize : "paper-a4";
   const factoryQrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(factoryMapUrl)}`;
   const showroomQrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(showroomMapUrl)}`;
   const autoPrintScript = action === "print"
@@ -829,16 +842,17 @@ function printDocument(docId, action = "open") {
     const left = items[index * 2 + 1] || {};
     const cell = (item, key) => escapeHtml(item[key] ?? "");
     const note = item => item.price ? `<small>${money.format(invoiceItemTotal(item))}</small>` : "";
-    const qaimText = item => item.mode === "linear" ? escapeHtml(item.qaim || 1) : item.mode === "supply_install" ? money.format(Number(item.qaim || 0)) : "";
+    const descriptionText = item => item.description ? `<em>${escapeHtml(item.description)}</em>` : "";
+    const qaimText = item => item.mode === "linear" ? `قائم ${escapeHtml(item.qaim || 1)}` : item.mode === "supply_install" ? `تركيب ${money.format(Number(item.qaim || 0))}` : "";
     return `
       <tr>
         <td>${calculationModeText(right.mode)}</td>
         <td>${cell(right, "count")}</td>
-        <td><strong>${cell(right, "measure")}</strong>${note(right)}</td>
+        <td><strong>${cell(right, "measure")}</strong>${descriptionText(right)}${note(right)}</td>
         <td>${qaimText(right)}</td>
         <td>${calculationModeText(left.mode)}</td>
         <td>${cell(left, "count")}</td>
-        <td><strong>${cell(left, "measure")}</strong>${note(left)}</td>
+        <td><strong>${cell(left, "measure")}</strong>${descriptionText(left)}${note(left)}</td>
         <td>${qaimText(left)}</td>
       </tr>
     `;
@@ -888,6 +902,7 @@ function printDocument(docId, action = "open") {
           body.paper-receipt td:nth-child(3),body.paper-receipt th:nth-child(3),body.paper-receipt td:nth-child(7),body.paper-receipt th:nth-child(7){width:20%}
           body.paper-receipt td:nth-child(4),body.paper-receipt th:nth-child(4),body.paper-receipt td:nth-child(8),body.paper-receipt th:nth-child(8){width:8%}
           body.paper-receipt td strong{line-height:1.25}
+          body.paper-receipt td em{font-size:6px;margin-top:1px}
           body.paper-receipt td small{font-size:6px;margin-top:1px}
           body.paper-receipt .summary{gap:3px;margin-top:5px}
           body.paper-receipt .summary div{font-size:8px;min-height:26px;padding:2px}
@@ -918,6 +933,7 @@ function printDocument(docId, action = "open") {
           td:nth-child(3),th:nth-child(3),td:nth-child(7),th:nth-child(7){width:24%}
           td:nth-child(4),th:nth-child(4),td:nth-child(8),th:nth-child(8){width:8%}
           td strong{display:block;line-height:1.5;white-space:normal;overflow-wrap:anywhere}
+          td em{display:block;margin-top:2px;color:#333;font-size:10px;font-style:normal;font-weight:800;line-height:1.35}
           td small{display:block;margin-top:2px;color:#00518c;font-size:11px;font-weight:800}
           .summary{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:10px}
           .summary div{border:2px solid #222;padding:6px 5px;text-align:center;font-size:12px;font-weight:800;min-height:44px}
@@ -933,6 +949,7 @@ function printDocument(docId, action = "open") {
           body.paper-a5 .location-qr img{width:39px;height:39px}
           body.paper-a5 .doc-info{grid-template-columns:repeat(2,1fr);font-size:10px;gap:4px 7px}
           body.paper-a5 th,body.paper-a5 td{font-size:10px;min-height:30px;padding:3px 2px;line-height:1.35}
+          body.paper-a5 td em{font-size:8px}
           body.paper-a5 td small{font-size:9px}
           body.paper-a5 .summary{grid-template-columns:repeat(3,1fr);gap:4px}
           body.paper-a5 .summary div{font-size:10px;min-height:34px;padding:3px}
@@ -948,6 +965,7 @@ function printDocument(docId, action = "open") {
           body.paper-half .location-qr img{width:35px;height:35px}
           body.paper-half .doc-info{grid-template-columns:repeat(2,1fr);font-size:9px;gap:3px 6px}
           body.paper-half th,body.paper-half td{font-size:9px;min-height:27px;padding:2px;line-height:1.3}
+          body.paper-half td em{font-size:7px}
           body.paper-half td small{font-size:8px}
           body.paper-half .summary{grid-template-columns:repeat(3,1fr);gap:3px}
           body.paper-half .summary div{font-size:9px;min-height:30px;padding:2px}
@@ -1006,6 +1024,7 @@ function printDocument(docId, action = "open") {
             <span><b>حالة الطلب</b><strong>${escapeHtml(d.orderStatus || "-")}</strong></span>
             <span><b>ميعاد التسليم</b><strong>${escapeHtml(d.deliveryDate || "-")}</strong></span>
             <span><b>الفني</b><strong>${escapeHtml(d.technician || "-")}</strong></span>
+            <span><b>مقاس الورقة</b><strong>${paperSizeText(savedPaperSize)}</strong></span>
           </section>
           <table>
             <thead><tr><th>الحساب</th><th>عدد</th><th>مقاس</th><th>قائم/تركيب</th><th>الحساب</th><th>عدد</th><th>مقاس</th><th>قائم/تركيب</th></tr></thead>
@@ -1069,9 +1088,11 @@ function printDocument(docId, action = "open") {
             requestAnimationFrame(fitInvoiceToPaper);
           });
           invoiceScale.addEventListener("input", syncPrintLayout);
+          paperSize.value = "${savedPaperSize}";
+          applyPaperPreset();
           if (${action === "pdf" ? "true" : "false"}) {
-            paperSize.value = "paper-a4";
-            invoiceScale.value = "100";
+            paperSize.value = "${savedPaperSize}";
+            applyPaperPreset();
           }
           syncPrintLayout();
           requestAnimationFrame(fitInvoiceToPaper);
@@ -1376,9 +1397,21 @@ document.addEventListener("click", async e => {
     state.orders = state.orders.filter(o => o.documentId !== btn.dataset.deleteDoc);
     await saveState(); renderAll();
   }
-  if (btn.dataset.openDoc) printDocument(btn.dataset.openDoc, "open");
-  if (btn.dataset.printDoc) printDocument(btn.dataset.printDoc, "print");
-  if (btn.dataset.pdfDoc) printDocument(btn.dataset.pdfDoc, "pdf");
+  if (btn.dataset.openDoc) {
+    e.preventDefault();
+    sessionStorage.setItem(ACTIVE_VIEW_KEY, "billing");
+    printDocument(btn.dataset.openDoc, "open");
+  }
+  if (btn.dataset.printDoc) {
+    e.preventDefault();
+    sessionStorage.setItem(ACTIVE_VIEW_KEY, "billing");
+    printDocument(btn.dataset.printDoc, "print");
+  }
+  if (btn.dataset.pdfDoc) {
+    e.preventDefault();
+    sessionStorage.setItem(ACTIVE_VIEW_KEY, "billing");
+    printDocument(btn.dataset.pdfDoc, "pdf");
+  }
   if (btn.dataset.openFactoryReport) printFactoryReport(btn.dataset.openFactoryReport, "open");
   if (btn.dataset.printFactoryReport) printFactoryReport(btn.dataset.printFactoryReport, "print");
   if (btn.dataset.pdfFactoryReport) printFactoryReport(btn.dataset.pdfFactoryReport, "pdf");
@@ -1479,6 +1512,7 @@ document.querySelector("#documentForm").addEventListener("submit", async e => {
   const unitPrice = Number(data.unitPrice || 0);
   const discount = Number(data.discount || 0);
   const extraWorkCost = Number(data.extraWorkCost || 0);
+  const invoicePaperSize = ["paper-a4", "paper-a5", "paper-half", "paper-receipt"].includes(data.invoicePaperSize) ? data.invoicePaperSize : "paper-a4";
   const widthFactor = data.unitMode === "linear" ? Number(data.widthFactor || 1) : 1;
   const subtotal = items.length ? invoiceItemsSubtotal(items) : quantity * unitPrice * widthFactor;
   const total = Math.max(0, subtotal + extraWorkCost - discount);
@@ -1497,6 +1531,7 @@ document.querySelector("#documentForm").addEventListener("submit", async e => {
     unitPrice,
     discount,
     extraWorkCost,
+    invoicePaperSize,
     widthFactor,
     items,
     subtotal,
@@ -1531,7 +1566,9 @@ document.querySelector("#documentForm").addEventListener("submit", async e => {
   els.invoiceItems.innerHTML = "";
   addInvoiceItemRow();
   syncCalculationFields();
-  await saveState(); renderAll();
+  await saveState();
+  renderAll();
+  switchView("billing");
 });
 
 document.querySelector("#factoryReportForm")?.addEventListener("submit", async e => {

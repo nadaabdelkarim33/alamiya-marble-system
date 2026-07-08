@@ -282,6 +282,46 @@ header h1 { margin: 6px 0 0; font-size: 30px; }
 .form { display: grid; gap: 14px; }
 .form-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
 .wide { grid-column: 1 / -1; }
+.extra-work-box,
+.paper-size-box {
+  padding: 12px;
+  border: 1px solid rgba(0,81,140,.22);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(255,223,31,.22), rgba(255,255,255,.8));
+  color: var(--blue);
+  box-shadow: 0 8px 22px rgba(0,81,140,.06);
+}
+.paper-size-box {
+  background: linear-gradient(135deg, rgba(0,81,140,.10), rgba(255,255,255,.84));
+}
+.extra-work-box input,
+.paper-size-box select {
+  border-color: rgba(0,81,140,.28);
+  font-weight: 800;
+}
+.calc-guide {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.calc-guide span {
+  display: grid;
+  gap: 3px;
+  min-height: 54px;
+  padding: 9px 10px;
+  border: 1px solid rgba(0,81,140,.16);
+  border-radius: 8px;
+  background: rgba(255,255,255,.64);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.55;
+}
+.calc-guide strong {
+  color: var(--blue);
+  font-size: 13px;
+}
 .invoice-customer-fields {
   display: grid;
   gap: 10px;
@@ -303,7 +343,7 @@ header h1 { margin: 6px 0 0; font-size: 30px; }
 .invoice-items-head,
 .invoice-item-row {
   display: grid;
-  grid-template-columns: 1.1fr .65fr 1.15fr .9fr .9fr 1fr 42px;
+  grid-template-columns: 1.05fr 1.2fr .55fr 1.05fr .8fr .8fr .9fr 42px;
   gap: 8px;
   align-items: center;
 }
@@ -407,6 +447,7 @@ header h1 { margin: 6px 0 0; font-size: 30px; }
   .cards, .grid.two { grid-template-columns: 1fr; }
   .board { grid-template-columns: repeat(4, minmax(220px, 1fr)); overflow-x: auto; }
   .form-grid { grid-template-columns: 1fr; }
+  .calc-guide { grid-template-columns: 1fr; }
   .invoice-items-head { display: none; }
   .invoice-item-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
