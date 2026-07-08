@@ -905,7 +905,37 @@ function printDocument(docId, action = "open") {
           .notes{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;margin-top:10px;font-size:11px}
           .box{border:2px solid #222;min-height:60px;padding:8px;line-height:1.6}
           .footer{margin-top:8px;display:flex;justify-content:space-between;gap:12px;font-size:12px;font-weight:800}
-          @media print{@page{size:A4 portrait;margin:4mm}html,body{width:210mm;height:297mm;overflow:hidden}body{padding:0;background:white}.no-print{display:none}.paper-wrap{display:block}.paper{box-shadow:none;border:0;transform:scale(var(--invoice-scale,1));transform-origin:top right}.paper-a4 .paper{width:200mm;max-height:287mm;overflow:hidden}.paper-a5 .paper,.paper-half .paper{width:140mm;max-height:200mm;overflow:hidden}.paper-receipt .paper{width:76mm;max-height:287mm;overflow:hidden}}
+          body.paper-a5 .brand{grid-template-columns:64px 1fr 104px;gap:7px;padding:7px}
+          body.paper-a5 .brand-logo{width:54px;height:54px}
+          body.paper-a5 .brand h1{font-size:18px}
+          body.paper-a5 .brand h2,body.paper-a5 .brand p{font-size:11px}
+          body.paper-a5 .address-line{font-size:8px}
+          body.paper-a5 .location-qr img{width:39px;height:39px}
+          body.paper-a5 .doc-info{grid-template-columns:repeat(2,1fr);font-size:10px;gap:4px 7px}
+          body.paper-a5 th,body.paper-a5 td{font-size:10px;min-height:30px;padding:3px 2px;line-height:1.35}
+          body.paper-a5 td small{font-size:9px}
+          body.paper-a5 .summary{grid-template-columns:repeat(3,1fr);gap:4px}
+          body.paper-a5 .summary div{font-size:10px;min-height:34px;padding:3px}
+          body.paper-a5 .summary strong{font-size:11px}
+          body.paper-a5 .notes{grid-template-columns:1fr;font-size:9px;gap:5px}
+          body.paper-a5 .box{min-height:auto;padding:5px;line-height:1.45}
+          body.paper-a5 .footer{font-size:10px;margin-top:6px}
+          body.paper-half .brand{grid-template-columns:58px 1fr 96px;gap:6px;padding:6px}
+          body.paper-half .brand-logo{width:48px;height:48px}
+          body.paper-half .brand h1{font-size:16px}
+          body.paper-half .brand h2,body.paper-half .brand p{font-size:10px}
+          body.paper-half .address-line{font-size:7px}
+          body.paper-half .location-qr img{width:35px;height:35px}
+          body.paper-half .doc-info{grid-template-columns:repeat(2,1fr);font-size:9px;gap:3px 6px}
+          body.paper-half th,body.paper-half td{font-size:9px;min-height:27px;padding:2px;line-height:1.3}
+          body.paper-half td small{font-size:8px}
+          body.paper-half .summary{grid-template-columns:repeat(3,1fr);gap:3px}
+          body.paper-half .summary div{font-size:9px;min-height:30px;padding:2px}
+          body.paper-half .summary strong{font-size:10px}
+          body.paper-half .notes{grid-template-columns:1fr;font-size:8px;gap:4px}
+          body.paper-half .box{min-height:auto;padding:4px;line-height:1.35}
+          body.paper-half .footer{font-size:9px;margin-top:5px}
+          @media print{@page{size:A4 portrait;margin:4mm}html,body{width:auto;height:auto;overflow:visible}body{padding:0;background:white}.no-print{display:none}.paper-wrap{display:block;overflow:visible}.paper{box-shadow:none;border:0;overflow:visible;break-inside:avoid;page-break-inside:avoid;transform:scale(var(--invoice-scale,1));transform-origin:top right}.paper-a4 .paper{width:200mm}.paper-a5 .paper,.paper-half .paper{width:140mm}.paper-receipt .paper{width:76mm;overflow:visible}}
           @media(max-width:900px){body{padding:8px}.paper{width:840px}.no-print{width:840px}}
         </style>
       </head>
@@ -979,6 +1009,21 @@ function printDocument(docId, action = "open") {
           const paperSize = document.querySelector("#paperSize");
           const invoiceScale = document.querySelector("#invoiceScale");
           const scaleValue = document.querySelector("#scaleValue");
+          const paperScalePreset = {
+            "paper-a4": 100,
+            "paper-a5": 86,
+            "paper-half": 78,
+            "paper-receipt": 100
+          };
+          const paperMaxHeight = {
+            "paper-a4": 1160,
+            "paper-a5": 790,
+            "paper-half": 720,
+            "paper-receipt": 1180
+          };
+          function applyPaperPreset() {
+            invoiceScale.value = paperScalePreset[paperSize.value] || 100;
+          }
           function syncPrintLayout() {
             document.body.classList.remove("paper-a4","paper-a5","paper-half","paper-receipt");
             document.body.classList.add(paperSize.value);
@@ -986,13 +1031,30 @@ function printDocument(docId, action = "open") {
             document.documentElement.style.setProperty("--invoice-scale", scale);
             scaleValue.textContent = invoiceScale.value + "%";
           }
-          paperSize.addEventListener("change", syncPrintLayout);
+          function fitInvoiceToPaper() {
+            const paper = document.querySelector(".paper");
+            const maxHeight = paperMaxHeight[paperSize.value] || paperMaxHeight["paper-a4"];
+            const preset = paperScalePreset[paperSize.value] || 100;
+            const currentTransform = paper.style.transform;
+            paper.style.transform = "none";
+            const contentHeight = paper.scrollHeight;
+            paper.style.transform = currentTransform;
+            const fitScale = Math.floor((maxHeight / Math.max(contentHeight, 1)) * 100);
+            invoiceScale.value = Math.max(55, Math.min(preset, fitScale));
+            syncPrintLayout();
+          }
+          paperSize.addEventListener("change", () => {
+            applyPaperPreset();
+            syncPrintLayout();
+            requestAnimationFrame(fitInvoiceToPaper);
+          });
           invoiceScale.addEventListener("input", syncPrintLayout);
           if (${action === "pdf" ? "true" : "false"}) {
             paperSize.value = "paper-a4";
-            invoiceScale.value = "90";
+            invoiceScale.value = "100";
           }
           syncPrintLayout();
+          requestAnimationFrame(fitInvoiceToPaper);
           function bindTap(element, handler) {
             let touched = false;
             element.addEventListener("touchend", event => {
@@ -1018,10 +1080,12 @@ function printDocument(docId, action = "open") {
             });
           }
           function printInvoice() {
+            fitInvoiceToPaper();
             window.focus();
             setTimeout(() => window.print(), 150);
           }
           async function downloadInvoicePdf() {
+            fitInvoiceToPaper();
             const paper = document.querySelector(".paper");
             const controls = document.querySelector(".no-print");
             try {
