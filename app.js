@@ -869,12 +869,32 @@ function printDocument(docId, action = "open") {
           body.paper-a5 .paper{width:560px;min-height:790px}
           body.paper-half .paper{width:520px;min-height:740px}
           body.paper-receipt .paper{width:360px;min-height:0;padding:8px 10px}
-          body.paper-receipt .doc-info{grid-template-columns:1fr}
+          body.paper-receipt .brand{display:grid;grid-template-columns:1fr;gap:5px;padding:6px;margin-bottom:6px}
+          body.paper-receipt .brand-logo{width:46px;height:46px}
+          body.paper-receipt .brand h1{font-size:16px;line-height:1.25}
+          body.paper-receipt .brand h2,body.paper-receipt .brand p{font-size:9px;line-height:1.35}
+          body.paper-receipt .address-line{font-size:7px;line-height:1.35}
+          body.paper-receipt .location-qr{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+          body.paper-receipt .location-qr a{min-width:0;padding:3px;border-radius:5px}
+          body.paper-receipt .location-qr img{width:34px;height:34px}
+          body.paper-receipt .doc-info{grid-template-columns:1fr;gap:2px;margin:5px 0;font-size:8px}
+          body.paper-receipt .doc-info span{grid-template-columns:42px 1fr;gap:3px;padding:2px 0}
           body.paper-receipt .summary{grid-template-columns:1fr}
-          body.paper-receipt .brand-logo{width:44px;height:44px}
-          body.paper-receipt .location-qr img{width:42px;height:42px}
-          body.paper-receipt .address-line{font-size:9px}
-          body.paper-receipt th,body.paper-receipt td{font-size:11px;padding:3px 2px;height:34px}
+          body.paper-receipt table{border-width:2px;table-layout:fixed}
+          body.paper-receipt th,body.paper-receipt td{font-size:7px;padding:2px 1px;min-height:20px;line-height:1.25;border-left-width:1px}
+          body.paper-receipt th{height:auto;font-size:7px}
+          body.paper-receipt td:nth-child(1),body.paper-receipt th:nth-child(1),body.paper-receipt td:nth-child(5),body.paper-receipt th:nth-child(5){width:14%}
+          body.paper-receipt td:nth-child(2),body.paper-receipt th:nth-child(2),body.paper-receipt td:nth-child(6),body.paper-receipt th:nth-child(6){width:8%}
+          body.paper-receipt td:nth-child(3),body.paper-receipt th:nth-child(3),body.paper-receipt td:nth-child(7),body.paper-receipt th:nth-child(7){width:20%}
+          body.paper-receipt td:nth-child(4),body.paper-receipt th:nth-child(4),body.paper-receipt td:nth-child(8),body.paper-receipt th:nth-child(8){width:8%}
+          body.paper-receipt td strong{line-height:1.25}
+          body.paper-receipt td small{font-size:6px;margin-top:1px}
+          body.paper-receipt .summary{gap:3px;margin-top:5px}
+          body.paper-receipt .summary div{font-size:8px;min-height:26px;padding:2px}
+          body.paper-receipt .summary strong{font-size:9px;margin-top:1px}
+          body.paper-receipt .notes{grid-template-columns:1fr;gap:4px;margin-top:5px;font-size:7px}
+          body.paper-receipt .box{min-height:auto;padding:4px;line-height:1.35;border-width:1px}
+          body.paper-receipt .footer{margin-top:5px;font-size:8px;gap:4px;line-height:1.4}
           .brand{display:grid;grid-template-columns:90px 1fr 142px;align-items:center;gap:14px;text-align:center;line-height:1.32;border:2px solid #222;padding:10px 12px;margin-bottom:10px}
           .brand-logo{width:72px;height:72px;display:block;margin:auto;border-radius:50%;border:3px solid #ffdf1f;object-fit:cover;box-shadow:0 5px 14px rgba(0,81,140,.14)}
           .brand h1{margin:0;color:#111;font-size:24px;font-weight:900}
@@ -1101,7 +1121,7 @@ function printDocument(docId, action = "open") {
               filename: "${escapeHtml(d.number)}.pdf",
               image: { type: "jpeg", quality: 0.98 },
               html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
-              jsPDF: { unit: "mm", format: paperSize.value === "paper-a4" ? "a4" : paperSize.value === "paper-a5" ? "a5" : [148, 210], orientation: "portrait" }
+              jsPDF: { unit: "mm", format: paperSize.value === "paper-a4" ? "a4" : paperSize.value === "paper-a5" ? "a5" : paperSize.value === "paper-receipt" ? [76, 220] : [148, 210], orientation: "portrait" }
             };
             try {
               await html2pdf().set(opt).from(paper).save();
