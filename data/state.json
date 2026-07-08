@@ -168,6 +168,12 @@
       "name": "محاجر المنيا",
       "phone": "01111111111",
       "address": "المنيا"
+    },
+    {
+      "name": "NADA ABD EL KARIM",
+      "phone": "+201017620872",
+      "address": "تلا",
+      "id": "s-1783458185612-f17ef8676241a8"
     }
   ],
   "movements": [],
@@ -184,6 +190,7 @@
       "createdBy": "u-admin"
     }
   ],
+  "factoryReports": [],
   "users": [
     {
       "id": "u-admin",

@@ -27,7 +27,7 @@
       <aside>
         <div class="brand">
           <div class="logo small" aria-label="شعار العالمية للرخام والجرانيت"></div>
-          <div><strong>العالمية</strong><span>للرخام والجرانيت</span></div>
+          <div><strong>العالمية</strong><span>للرخام والجرانيت</span><span class="brand-manager">إدارة: م/ إيهاب عبدالعال</span></div>
         </div>
         <nav>
           <button class="nav active" data-view="dashboard"><span class="material-symbols-outlined">dashboard</span>لوحة التحكم</button>
@@ -35,8 +35,8 @@
           <button class="nav" data-view="customers"><span class="material-symbols-outlined">groups</span>العملاء</button>
           <button class="nav" data-view="billing"><span class="material-symbols-outlined">receipt_long</span>الفواتير والعروض</button>
           <button class="nav" data-view="reports"><span class="material-symbols-outlined">bar_chart</span>التقارير</button>
+          <button class="nav" data-view="factoryReports"><span class="material-symbols-outlined">engineering</span>تقارير المصنع</button>
           <button class="nav" data-view="stock"><span class="material-symbols-outlined">inventory_2</span>المخزون</button>
-          <button class="nav" data-view="orders"><span class="material-symbols-outlined">construction</span>الطلبات والتركيبات</button>
           <button class="nav" data-view="users"><span class="material-symbols-outlined">admin_panel_settings</span>الصلاحيات</button>
         </nav>
       </aside>
@@ -44,12 +44,11 @@
       <main>
         <header>
           <div>
-            <p class="eyebrow">إدارة: م/ إيهاب عبدالعال</p>
             <h1 id="pageTitle">لوحة التحكم</h1>
           </div>
           <div class="actions">
             <span class="chip" id="currentUser"></span>
-            <button class="ghost" id="exportBtn"><span class="material-symbols-outlined">download</span>تصدير</button>
+            <button class="ghost" id="exportBtn"><span class="material-symbols-outlined">picture_as_pdf</span>حفظ PDF</button>
             <button class="ghost" id="importBtn"><span class="material-symbols-outlined">upload</span>استيراد</button>
             <input class="hidden" id="importFile" type="file" accept="application/json" />
             <button class="ghost" id="logoutBtn"><span class="material-symbols-outlined">logout</span>خروج</button>
@@ -82,7 +81,6 @@
         <section class="view" id="customersView">
           <div class="toolbar">
             <input id="customerSearch" placeholder="بحث في العملاء" />
-            <button class="primary" id="newCustomer"><span class="material-symbols-outlined">person_add</span>عميل جديد</button>
           </div>
           <div class="table-wrap"><table><thead><tr><th>العميل</th><th>التليفون</th><th>العنوان</th><th>الطلبات السابقة</th><th>ملاحظات</th><th></th></tr></thead><tbody id="customers"></tbody></table></div>
         </section>
@@ -92,28 +90,97 @@
             <div class="panel-head"><h2>عرض سعر / فاتورة بيع</h2><span class="chip">طباعة أو PDF أو واتساب</span></div>
             <div class="form-grid">
               <label>نوع المستند<select name="type"><option value="quote">عرض سعر</option><option value="invoice">فاتورة بيع</option></select></label>
-              <label>العميل<select name="customerId" id="docCustomer"></select></label>
               <label>الخام<select name="productId" id="docProduct"></select></label>
-              <label>الحساب<select name="unitMode"><option value="meter">بالمتر المربع</option><option value="linear">بالمتر الطولي</option><option value="piece">بالقطعة</option></select></label>
-              <label id="quantityLabel">الكمية<input name="quantity" type="number" step="0.01" min="0.01" value="1" /></label>
-              <label>سعر الوحدة<input name="unitPrice" type="number" step="0.01" min="0" /></label>
+              <div class="invoice-customer-fields wide">
+                <div class="panel-head compact-head"><h2>بيانات العميل</h2><span class="chip">تتسجل تلقائيًا في العملاء</span></div>
+                <div class="form-grid">
+                  <label>اسم العميل<input name="customerName" required placeholder="اكتب اسم العميل" /></label>
+                  <label>رقم التليفون<input name="customerPhone" placeholder="رقم العميل" /></label>
+                  <label>العنوان<input name="customerAddress" placeholder="عنوان العميل" /></label>
+                </div>
+              </div>
+              <label class="hidden">الحساب<select name="unitMode"><option value="meter">بالمتر المربع</option><option value="linear">بالمتر الطولي</option><option value="piece">بالقطعة</option></select></label>
+              <label id="quantityLabel" class="hidden">الكمية<input name="quantity" type="number" step="0.01" min="0.01" value="1" /></label>
+              <label class="hidden">سعر الوحدة<input name="unitPrice" type="number" step="0.01" min="0" /></label>
               <label class="linear-field hidden">العرض<select name="linearWidth"><option value="60">حتى 60 سم</option><option value="65">65 سم</option><option value="70">70 سم</option><option value="custom">عرض خاص</option></select></label>
               <label class="linear-field hidden">معامل العرض<input name="widthFactor" type="number" step="0.01" min="1" value="1" /></label>
+              <div class="invoice-items-editor wide">
+                <div class="panel-head compact-head">
+                  <h2>بنود الفاتورة</h2>
+                  <button class="ghost" type="button" id="addInvoiceItem"><span class="material-symbols-outlined">add</span>إضافة بند</button>
+                </div>
+                <div class="invoice-items-head">
+                  <span>نوع الحساب</span>
+                  <span>العدد</span>
+                  <span>المقاس</span>
+                  <span>قائم / تركيب</span>
+                  <span>السعر</span>
+                  <span>الإجمالي</span>
+                  <span></span>
+                </div>
+                <div id="invoiceItems"></div>
+              </div>
               <label>الخصم<input name="discount" type="number" step="0.01" min="0" value="0" /></label>
+              <label>مصنعية / تركيب إضافي<input name="extraWorkCost" type="number" step="0.01" min="0" value="0" placeholder="أي زيادة على المبلغ" /></label>
               <label>حالة الدفع<select name="paymentStatus"><option value="paid">دفع كامل</option><option value="deposit">عربون</option><option value="unpaid">مدفعش</option></select></label>
               <label>المدفوع<input name="paidAmount" type="number" step="0.01" min="0" value="0" /></label>
               <label>طريقة الدفع<select name="paymentMethod"><option value="cash">نقدي</option><option value="vodafone">فودافون كاش</option><option value="instapay">انستا باي</option><option value="bank">تحويل بنكي</option></select></label>
+              <label>حالة الطلب<select name="orderStatus"><option>قيد المعاينة</option><option>جاري التصنيع</option><option>جاهز</option><option>تم التركيب</option></select></label>
+              <label>ميعاد التسليم<input name="deliveryDate" type="date" /></label>
+              <label>الفني / فريق التركيب<input name="technician" /></label>
               <label class="wide">ملاحظات<textarea name="notes" rows="2"></textarea></label>
             </div>
             <div class="form-actions"><strong id="docTotal">الإجمالي: 0 ج.م</strong><button class="primary" type="submit"><span class="material-symbols-outlined">save</span>حفظ</button></div>
           </form>
-          <div class="table-wrap"><table><thead><tr><th>رقم</th><th>النوع</th><th>العميل</th><th>الخام</th><th>الإجمالي</th><th>التاريخ</th><th></th></tr></thead><tbody id="documents"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>رقم</th><th>النوع</th><th>العميل</th><th>الخام</th><th>حالة الطلب</th><th>التسليم</th><th>الإجمالي</th><th>التاريخ</th><th></th></tr></thead><tbody id="documents"></tbody></table></div>
         </section>
 
         <section class="view" id="reportsView">
           <div class="panel">
             <div class="panel-head"><h2>تقرير العملاء والطلبات</h2><span class="chip">العميل / الطلب / الدفع / المتبقي</span></div>
             <div class="table-wrap"><table><thead><tr><th>التاريخ والساعة</th><th>العميل</th><th>الطلب</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>حالة الدفع</th><th>طريقة الدفع</th></tr></thead><tbody id="reports"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="view" id="factoryReportsView">
+          <form class="panel form" id="factoryReportForm">
+            <div class="panel-head">
+              <h2>تقرير مصنع جديد</h2>
+              <span class="chip">صيانة / أعطال / مصروفات</span>
+            </div>
+            <div class="form-grid">
+              <label>نوع التقرير
+                <select name="type">
+                  <option>صيانة</option>
+                  <option>عطل</option>
+                  <option>مصروف</option>
+                  <option>قطع غيار</option>
+                  <option>أخرى</option>
+                </select>
+              </label>
+              <label>البند / السبب<input name="title" required placeholder="مثال: صيانة ماكينة القص" /></label>
+              <label>المبلغ الخارج<input name="amount" type="number" step="0.01" min="0" required value="0" /></label>
+              <label>التاريخ والساعة<input name="dateTime" type="datetime-local" /></label>
+              <label>المسؤول / الفني<input name="person" placeholder="اسم الفني أو المسؤول" /></label>
+              <label>طريقة الدفع
+                <select name="paymentMethod">
+                  <option value="cash">نقدي</option>
+                  <option value="vodafone">فودافون كاش</option>
+                  <option value="instapay">انستا باي</option>
+                  <option value="bank">تحويل بنكي</option>
+                </select>
+              </label>
+              <label class="wide">التفاصيل / ملاحظات<textarea name="notes" rows="3" placeholder="اكتب الحاجة اللي باظت أو الصيانة اتعملت إزاي"></textarea></label>
+            </div>
+            <div class="form-actions">
+              <button class="primary" type="submit"><span class="material-symbols-outlined">save</span>حفظ التقرير</button>
+            </div>
+          </form>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>رقم</th><th>النوع</th><th>البند</th><th>المبلغ</th><th>التاريخ</th><th>المسؤول</th><th>الدفع</th><th></th></tr></thead>
+              <tbody id="factoryReports"></tbody>
+            </table>
           </div>
         </section>
 
@@ -126,32 +193,11 @@
               </div>
               <div class="table-wrap"><table><thead><tr><th>النوع</th><th>السعر</th></tr></thead><tbody id="stockProducts"></tbody></table></div>
             </section>
-            <form class="panel form" id="supplierForm">
-              <div class="panel-head"><h2>الموردين</h2></div>
-              <div class="form-grid">
-                <label>اسم المورد<input name="name" required /></label>
-                <label>التليفون<input name="phone" /></label>
-                <label class="wide">العنوان<input name="address" /></label>
-              </div>
-              <button class="primary" type="submit"><span class="material-symbols-outlined">add_business</span>إضافة مورد</button>
-            </form>
+            <section class="panel">
+              <div class="panel-head"><h2>الموردين</h2><span class="chip">يتسجلوا من إضافة المنتج</span></div>
+              <div class="table-wrap"><table><thead><tr><th>المورد</th><th>التليفون</th><th>عدد الخامات</th><th>آخر تسجيل</th></tr></thead><tbody id="suppliers"></tbody></table></div>
+            </section>
           </div>
-        </section>
-
-        <section class="view" id="ordersView">
-          <form class="panel form" id="orderForm">
-            <div class="panel-head"><h2>طلب جديد</h2></div>
-            <div class="form-grid">
-              <label>العميل<select name="customerId" id="orderCustomer"></select></label>
-              <label>الخام<select name="productId" id="orderProduct"></select></label>
-              <label>الحالة<select name="status"><option>قيد المعاينة</option><option>جاري التصنيع</option><option>جاهز</option><option>تم التركيب</option></select></label>
-              <label>ميعاد التسليم<input name="deliveryDate" type="date" /></label>
-              <label>الفني / فريق التركيب<input name="technician" /></label>
-              <label class="wide">ملاحظات<input name="notes" /></label>
-            </div>
-            <button class="primary" type="submit"><span class="material-symbols-outlined">add_task</span>حفظ الطلب</button>
-          </form>
-          <div class="board" id="orders"></div>
         </section>
 
         <section class="view" id="usersView">
@@ -167,12 +213,20 @@
           </form>
           <div class="table-wrap"><table><thead><tr><th>اسم الدخول</th><th>الاسم</th><th>الدور</th><th></th></tr></thead><tbody id="users"></tbody></table></div>
         </section>
+
+        <footer class="maker-credit" aria-label="Made by Eng Nada Abdelkarim">
+          <span class="maker-copy">
+            <span class="maker-kicker">made by</span>
+            <strong>eng nada abdelkarim</strong>
+          </span>
+          <span class="maker-line"></span>
+        </footer>
       </main>
     </div>
 
     <dialog id="productDialog">
       <form class="modal form" id="productForm" method="dialog">
-        <div class="panel-head"><h2>بيانات الخام</h2><button class="icon" value="cancel"><span class="material-symbols-outlined">close</span></button></div>
+        <div class="panel-head"><h2>بيانات الخام</h2><button class="icon" type="button" data-close-dialog="product"><span class="material-symbols-outlined">close</span></button></div>
         <input type="hidden" name="id" />
         <div class="form-grid">
           <label>النوع<select name="kind"><option>رخام</option><option>جرانيت</option></select></label>
@@ -181,6 +235,10 @@
           <label>المقاس<input name="size" /></label>
           <label>السمك<input name="thickness" /></label>
           <label>سعر المتر<input name="price" type="number" step="0.01" min="0" /></label>
+          <label>اسم المورد<input name="supplierName" placeholder="اسم المورد" /></label>
+          <label>رقم المورد<input name="supplierPhone" placeholder="تليفون المورد" /></label>
+          <label>جه إزاي<input name="suppliedVia" placeholder="نقل / مندوب / محجر..." /></label>
+          <label>تاريخ وساعة التسجيل<input name="suppliedAt" type="datetime-local" /></label>
           <label class="wide">صورة الخام<input name="imageFile" type="file" accept="image/*" /></label>
           <label class="wide">ملاحظات<textarea name="notes"></textarea></label>
         </div>
@@ -190,7 +248,7 @@
 
     <dialog id="customerDialog">
       <form class="modal form" id="customerForm" method="dialog">
-        <div class="panel-head"><h2>بيانات العميل</h2><button class="icon" value="cancel"><span class="material-symbols-outlined">close</span></button></div>
+        <div class="panel-head"><h2>بيانات العميل</h2><button class="icon" type="button" data-close-dialog="customer"><span class="material-symbols-outlined">close</span></button></div>
         <input type="hidden" name="id" />
         <div class="form-grid">
           <label>اسم العميل<input name="name" required /></label>
